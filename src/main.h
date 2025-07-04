@@ -17,6 +17,7 @@
 #include "imgui_impl_win32.h"
 
 #include "utils.h"
+#include "imgui_utils.h"
 
 namespace samp = sampapi::v037r1;
 

@@ -1,8 +1,13 @@
 #pragma once
 
 #include <iostream>
-#include "imgui.h"
+#include <sampapi/sampapi.h>
 
-void changeFontSize(ImGuiIO io, std::string szFont, float size);
+#include "imgui.h"
+#include "imgui_impl_dx9.h"
+
+void changeFontSize(ImGuiIO& io, int size);
 
 void drawShadowText(ImDrawList* dl, float x, float y, std::string text, unsigned long color);
+
+char* GetFontFace();

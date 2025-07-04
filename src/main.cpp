@@ -89,6 +89,8 @@ void Main::TryInitImgui() {
 
     ImGui::GetIO().Fonts->Clear();
     ImGui::GetIO().Fonts->AddFontDefault();
+    //int fontSize = getFontSize();
+    //changeFontSize(ImGui::GetIO(), fontSize);
 
     isImguiInitialized = true;
     std::cout << "inited!\n";
@@ -104,8 +106,16 @@ void Main::CChatBubble__Draw(
         return;
     }
 
+    
     ImGui_ImplWin32_NewFrame();
     ImGui_ImplDX9_NewFrame();
+    static int fontSize = 0;
+    int currentFontSize = getFontSize();
+    if (fontSize != currentFontSize) {
+        changeFontSize(ImGui::GetIO(), currentFontSize);
+        fontSize = currentFontSize;
+        std::cout << fontSize << '\n';
+    }
     ImGui::NewFrame();
 
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
@@ -113,6 +123,4 @@ void Main::CChatBubble__Draw(
 
     ImGui::Render();
     ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
-
-    std::cout << "RENDER!\n";
 }

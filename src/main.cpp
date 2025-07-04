@@ -1,5 +1,14 @@
 ﻿#include "main.h"
 
+void OpenConsole() {
+    AllocConsole();
+
+    FILE* fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stderr);
+    freopen_s(&fp, "CONIN$", "r", stdin);
+}
+
 std::array<std::array<samp::CChatBubble::Player, 5>, 1004> g_Bubbles;
 
 Main::Main() {
@@ -16,6 +25,8 @@ Main::Main() {
             return this->CChatBubble__Add(hook, p_this, n_Player, szText, color, fDrawDistance, lifeSpan);
         });
     hookCChatBubble__Add.install();
+
+    OpenConsole();
 }
 
 Main::~Main() {
@@ -61,65 +72,47 @@ int16_t Main::CChatBubble__Add(
     return orig;
 }
 
+void Main::TryInitImgui() {
+    bool isSAMPInitialized = *reinterpret_cast<void**>(sampapi::GetBase() + 0x21A0F8) != nullptr;
+    if (isImguiInitialized || !isSAMPInitialized)
+        return;
+
+    HWND hwnd = *reinterpret_cast<HWND*>(0xC17054);
+    IDirect3DDevice9* pDevice = *reinterpret_cast<IDirect3DDevice9**>(0xC97C28);
+
+    if (!hwnd || !pDevice)
+        return;
+
+    ImGui::CreateContext();
+    ImGui_ImplWin32_Init(**reinterpret_cast<HWND**>(0xC17054));
+    ImGui_ImplDX9_Init(pDevice);
+
+    ImGui::GetIO().Fonts->Clear();
+    ImGui::GetIO().Fonts->AddFontDefault();
+
+    isImguiInitialized = true;
+    std::cout << "inited!\n";
+}
+
 void Main::CChatBubble__Draw(
     const decltype(hookCChatBubble__Draw)& hook,
     samp::CChatBubble* p_this
 ) {
-    if (samp::RefGame() && samp::RefGame()->GetPlayerPed() && samp::RefNetGame()) {
-        if (samp::RefLabel())
-            samp::RefLabel()->Begin();
-
-        DWORD lastTick = GetTickCount();
-        int largestId = samp::RefNetGame()->m_pPools->m_pPlayer->m_nLargestId;
-        for (int i = 0; i < largestId; i++) {
-            auto playerInfo = samp::RefNetGame()->m_pPools->m_pPlayer->m_pObject[i];
-            if (!playerInfo)
-                continue;
-
-            auto player = playerInfo->m_pPlayer->m_pPed;
-            if (!player)
-                continue;
-
-            auto* playerPed = player->m_pGamePed;
-            float distanceToPlayer = player->GetDistanceToLocalPlayer();
-            float distanceToCam = player->GetDistanceToCamera();
-            float chatBubbleHeight = getChatBubbleHeight();
-            int fontSize = getFontSize();
-
-            RwV3d RwPos;
-            playerPed->GetBonePosition(RwPos, 8, 1);
-            sampapi::CVector vecPos = *(sampapi::CVector*)&RwPos;
-
-            float baseZ = vecPos.z;
-            short idx = 0;
-            float cumulativeMargin = 0.0;
-            for (auto& bubble : g_Bubbles[i]) {
-                if (!bubble.m_bExists)
-                    continue;
-
-                if (distanceToPlayer > bubble.m_fDrawDistance)
-                    continue;
-
-                if (lastTick > (bubble.m_creationTick + bubble.m_lifeSpan)) {
-                    bubble.m_bExists = 0;
-                    continue;
-                }
-
-                float lines = std::max(0, bubble.m_nMaxLineLength - 1);
-                float heightOffset = 0.08 * lines;
-                float scaleOffset = 0.0125 * lines;
-
-                float perspectiveFix = distanceToCam * 0.02;
-                float bubbleHeight = perspectiveFix * bubble.m_nMaxLineLength * (fontSize * 0.075);
-
-                vecPos.z = baseZ + distanceToCam * (scaleOffset + chatBubbleHeight) + heightOffset + 0.2 + cumulativeMargin;
-
-                samp::RefLabel()->Draw(&vecPos, bubble.m_szText, bubble.m_color, 1, 0);
-
-                cumulativeMargin += bubbleHeight;
-            }
-        }
-        if (samp::RefLabel())
-            samp::RefLabel()->End();
+    if (!isImguiInitialized) {
+        std::cout << "try to init\n";
+        this->TryInitImgui();
+        return;
     }
+
+    ImGui_ImplWin32_NewFrame();
+    ImGui_ImplDX9_NewFrame();
+    ImGui::NewFrame();
+
+    ImDrawList* dl = ImGui::GetBackgroundDrawList();
+    dl->AddText(ImVec2(10, 10), 0xFFFFFFFF, "TEXT FOR RENDER");
+
+    ImGui::Render();
+    ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+
+    std::cout << "RENDER!\n";
 }

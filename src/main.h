@@ -10,6 +10,12 @@
 #include <sampapi/CEntity.h>
 #include <sampapi/CFonts.h>
 
+#include <d3d9.h>
+#include "imgui.h"
+#include "imgui_internal.h"
+#include "imgui_impl_dx9.h"
+#include "imgui_impl_win32.h"
+
 #include "utils.h"
 
 namespace samp = sampapi::v037r1;
@@ -19,6 +25,8 @@ using CChatBubble__AddProto = int16_t(__thiscall*)(samp::CChatBubble*, uint16_t,
 
 class Main {
 public:
+    bool isImguiInitialized = false;
+
     Main();
     ~Main();
 
@@ -39,4 +47,6 @@ public:
         float fDrawDistance,
         int lifeSpan
     );
+
+    void TryInitImgui();
 } g_Main;

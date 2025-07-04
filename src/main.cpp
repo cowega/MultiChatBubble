@@ -77,20 +77,18 @@ void Main::TryInitImgui() {
     if (isImguiInitialized || !isSAMPInitialized)
         return;
 
-    HWND hwnd = *reinterpret_cast<HWND*>(0xC17054);
+    HWND* hwnd = *reinterpret_cast<HWND**>(0xC17054);
     IDirect3DDevice9* pDevice = *reinterpret_cast<IDirect3DDevice9**>(0xC97C28);
 
     if (!hwnd || !pDevice)
         return;
 
     ImGui::CreateContext();
-    ImGui_ImplWin32_Init(**reinterpret_cast<HWND**>(0xC17054));
+    ImGui_ImplWin32_Init(*hwnd);
     ImGui_ImplDX9_Init(pDevice);
 
     ImGui::GetIO().Fonts->Clear();
     ImGui::GetIO().Fonts->AddFontDefault();
-    //int fontSize = getFontSize();
-    //changeFontSize(ImGui::GetIO(), fontSize);
 
     isImguiInitialized = true;
     std::cout << "inited!\n";
@@ -106,9 +104,9 @@ void Main::CChatBubble__Draw(
         return;
     }
 
-    
     ImGui_ImplWin32_NewFrame();
     ImGui_ImplDX9_NewFrame();
+
     static int fontSize = 0;
     int currentFontSize = getFontSize();
     if (fontSize != currentFontSize) {
@@ -116,10 +114,81 @@ void Main::CChatBubble__Draw(
         fontSize = currentFontSize;
         std::cout << fontSize << '\n';
     }
-    ImGui::NewFrame();
 
+    ImGui::NewFrame();
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
-    dl->AddText(ImVec2(10, 10), 0xFFFFFFFF, "TEXT FOR RENDER");
+
+
+
+
+
+
+
+    if (samp::RefGame() && samp::RefGame()->GetPlayerPed() && samp::RefNetGame()) {
+        if (samp::RefLabel())
+            samp::RefLabel()->Begin();
+
+        DWORD lastTick = GetTickCount();
+        int largestId = samp::RefNetGame()->m_pPools->m_pPlayer->m_nLargestId;
+        for (int i = 0; i < largestId; i++) {
+            auto playerInfo = samp::RefNetGame()->m_pPools->m_pPlayer->m_pObject[i];
+            if (!playerInfo)
+                continue;
+
+            auto player = playerInfo->m_pPlayer->m_pPed;
+            if (!player)
+                continue;
+
+            auto* playerPed = player->m_pGamePed;
+            float distanceToPlayer = player->GetDistanceToLocalPlayer();
+            float distanceToCam = player->GetDistanceToCamera();
+            float chatBubbleHeight = getChatBubbleHeight();
+            int fontSize = getFontSize();
+
+            RwV3d RwPos;
+            playerPed->GetBonePosition(RwPos, 8, 1);
+            sampapi::CVector vecPos = *(sampapi::CVector*)&RwPos;
+
+            CVector vecScreen;
+            float margin = 5.0;
+            float yOffset = 0.0f;
+            bool didFirst = false;
+
+            for (auto& bubble : g_Bubbles[i]) {
+                if (!bubble.m_bExists)
+                    continue;
+
+                if (distanceToPlayer > bubble.m_fDrawDistance)
+                    continue;
+
+                if (lastTick > (bubble.m_creationTick + bubble.m_lifeSpan)) {
+                    bubble.m_bExists = false;
+                    continue;
+                }
+
+                ImVec2 textRect = ImGui::CalcTextSize(bubble.m_szText);
+
+                if (!didFirst) {
+                    float lines = std::max(0, bubble.m_nMaxLineLength - 1);
+                    float heightOffset = 0.08f * lines;
+                    float scaleOffset = 0.0125f * lines;
+
+                    vecPos.z += distanceToCam * (scaleOffset + chatBubbleHeight) + heightOffset + 0.2f;
+                    CalcScreenCoors((CVector*)&vecPos, &vecScreen);
+                    didFirst = true;
+                } else 
+                    vecScreen.y -= textRect.y;
+
+                if (vecScreen.z > 0.0)
+                    drawShadowText(dl, vecScreen.x - textRect.x * 0.5f, vecScreen.y, bubble.m_szText, bubble.m_color);
+
+                vecScreen.y -= margin;
+            }
+
+        }
+        if (samp::RefLabel())
+            samp::RefLabel()->End();
+    }
 
     ImGui::Render();
     ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());

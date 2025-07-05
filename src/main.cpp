@@ -91,7 +91,6 @@ void Main::TryInitImgui() {
     ImGui::GetIO().Fonts->AddFontDefault();
 
     isImguiInitialized = true;
-    std::cout << "inited!\n";
 }
 
 void Main::CChatBubble__Draw(
@@ -99,7 +98,6 @@ void Main::CChatBubble__Draw(
     samp::CChatBubble* p_this
 ) {
     if (!isImguiInitialized) {
-        std::cout << "try to init\n";
         this->TryInitImgui();
         return;
     }
@@ -112,7 +110,6 @@ void Main::CChatBubble__Draw(
     if (fontSize != currentFontSize) {
         changeFontSize(ImGui::GetIO(), currentFontSize);
         fontSize = currentFontSize;
-        std::cout << fontSize << '\n';
     }
 
     ImGui::NewFrame();

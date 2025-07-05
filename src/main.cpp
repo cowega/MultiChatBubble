@@ -2,7 +2,7 @@
 
 void OpenConsole() {
     AllocConsole();
-
+    SetConsoleOutputCP(1251);
     FILE* fp;
     freopen_s(&fp, "CONOUT$", "w", stdout);
     freopen_s(&fp, "CONOUT$", "w", stderr);
@@ -118,11 +118,13 @@ void Main::CChatBubble__Draw(
     ImGui::NewFrame();
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
 
-
     if (samp::RefGame() && samp::RefGame()->GetPlayerPed() && samp::RefNetGame()) {
         if (samp::RefLabel())
             samp::RefLabel()->Begin();
 
+        float margin = 5.0f;
+
+        CVector vecScreen;
         DWORD lastTick = GetTickCount();
         int largestId = samp::RefNetGame()->m_pPools->m_pPlayer->m_nLargestId;
         for (int i = 0; i < largestId; i++) {
@@ -138,15 +140,13 @@ void Main::CChatBubble__Draw(
             float distanceToPlayer = player->GetDistanceToLocalPlayer();
             float distanceToCam = player->GetDistanceToCamera();
             float chatBubbleHeight = getChatBubbleHeight();
-            int fontSize = getFontSize();
 
             RwV3d RwPos;
             playerPed->GetBonePosition(RwPos, 8, 1);
             sampapi::CVector vecPos = *(sampapi::CVector*)&RwPos;
 
-            CVector vecScreen;
-            float margin = 5.0;
-            bool didFirst = false;
+            vecPos.z += distanceToCam * chatBubbleHeight + 0.2;
+            CalcScreenCoors((CVector*)&vecPos, &vecScreen);
 
             for (auto& bubble : g_Bubbles[i]) {
                 if (!bubble.m_bExists)
@@ -160,26 +160,25 @@ void Main::CChatBubble__Draw(
                     continue;
                 }
 
-                ImVec2 textRect = ImGui::CalcTextSize(bubble.m_szText);
+                std::string utf8_ChatBubbleText = CP1251ToUTF8(bubble.m_szText);
 
-                if (!didFirst) {
-                    float lines = std::max(0, bubble.m_nMaxLineLength - 1);
-                    float heightOffset = 0.08 * lines;
-                    float scaleOffset = 0.0125 * lines;
+                std::vector<std::string> lines;
+                float totalHeight = 0.0f;
+                calcTotalHeight(utf8_ChatBubbleText, 300, totalHeight, lines);
 
-                    vecPos.z += distanceToCam * (scaleOffset + chatBubbleHeight) + heightOffset + 0.25;
-                    CalcScreenCoors((CVector*)&vecPos, &vecScreen);
-                    didFirst = true;
-                } else 
-                    vecScreen.y -= textRect.y;
-
-                uint32_t color = fadeInOut(lastTick, bubble.m_creationTick, bubble.m_lifeSpan, 200, bubble.m_color);
-                if (vecScreen.z > 0.0)
-                    drawShadowText(dl, vecScreen.x - textRect.x * 0.5, vecScreen.y, bubble.m_szText, color);
-
+                vecScreen.y -= totalHeight;
+                float y = vecScreen.y;
+                if (vecScreen.z > 0) {
+                    for (const auto& line : lines) {
+                        ImVec2 size = ImGui::CalcTextSize(line.c_str());
+                        float x = vecScreen.x - size.x / 2;
+                        uint32_t color = fadeInOut(lastTick, bubble.m_creationTick, bubble.m_lifeSpan, 180, bubble.m_color);
+                        drawShadowText(dl, x, y, line.c_str(), color);
+                        y += size.y;
+                    }
+                }
                 vecScreen.y -= margin;
             }
-
         }
         if (samp::RefLabel())
             samp::RefLabel()->End();

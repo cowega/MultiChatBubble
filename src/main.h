@@ -1,4 +1,4 @@
-#include <Windows.h>
+﻿#include <Windows.h>
 #include <iostream>
 
 #include <kthook/kthook.hpp>
@@ -9,6 +9,7 @@
 #include <sampapi/CLabel.h>
 #include <sampapi/CEntity.h>
 #include <sampapi/CFonts.h>
+#include <sampapi/CChat.h>
 
 #include <d3d9.h>
 #include "imgui.h"

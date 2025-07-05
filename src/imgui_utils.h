@@ -2,7 +2,10 @@
 
 #include <Windows.h>
 #include <iostream>
+#include <sstream>
 #include <algorithm>
+#include <vector>
+
 #include <sampapi/sampapi.h>
 
 #include "imgui.h"
@@ -14,8 +17,16 @@ void drawShadowText(ImDrawList* dl, float x, float y, std::string text, uint32_t
 
 char* GetFontFace();
 
-std::string convertCP1251ToUTF8(const std::string& str_cp1251);
+std::string CP1251ToUTF8(const std::string& cp1251);
 
 ImU32 ñonvertARGBToRGBA(uint32_t sampColor);
 
 uint32_t fadeInOut(int lastTick, int creationTick, int lifeSpan, int duration, uint32_t color);
+
+std::vector<std::string> WrapText(const std::string& text, float maxWidth);
+
+void calcTotalHeight(
+    std::string text,
+    float maxWidth, float& totalHeight,
+    std::vector<std::string>& lines
+);

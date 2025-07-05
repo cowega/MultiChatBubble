@@ -6,7 +6,7 @@ void changeFontSize(ImGuiIO& io, int size) {
 
     io.Fonts->Clear();
 
-    ImFont* newFont = io.Fonts->AddFontFromFileTTF(font.c_str(), size - 3.0f, NULL, io.Fonts->GetGlyphRangesCyrillic());
+    ImFont* newFont = io.Fonts->AddFontFromFileTTF(font.c_str(), size - 3.0, NULL, io.Fonts->GetGlyphRangesCyrillic());
 
     if (newFont) {
         io.FontDefault = newFont;
@@ -22,10 +22,10 @@ void drawShadowText(ImDrawList* dl, float x, float y, std::string text, uint32_t
     uint32_t shadowColor = color & 0xFF000000;
     text = convertCP1251ToUTF8(text);
 
-	dl->AddText(ImVec2(x + 1.0f, y), shadowColor, text.c_str());
-	dl->AddText(ImVec2(x, y + 1.0f), shadowColor, text.c_str());
-	dl->AddText(ImVec2(x - 1.0f, y), shadowColor, text.c_str());
-	dl->AddText(ImVec2(x, y - 1.0f), shadowColor, text.c_str());
+	dl->AddText(ImVec2(x + 1.0, y), shadowColor, text.c_str());
+	dl->AddText(ImVec2(x, y + 1.0), shadowColor, text.c_str());
+	dl->AddText(ImVec2(x - 1.0, y), shadowColor, text.c_str());
+	dl->AddText(ImVec2(x, y - 1.0), shadowColor, text.c_str());
 	dl->AddText(ImVec2(x, y), color, text.c_str());
 }
 

@@ -146,7 +146,6 @@ void Main::CChatBubble__Draw(
 
             CVector vecScreen;
             float margin = 5.0;
-            float yOffset = 0.0f;
             bool didFirst = false;
 
             for (auto& bubble : g_Bubbles[i]) {
@@ -165,17 +164,17 @@ void Main::CChatBubble__Draw(
 
                 if (!didFirst) {
                     float lines = std::max(0, bubble.m_nMaxLineLength - 1);
-                    float heightOffset = 0.08f * lines;
-                    float scaleOffset = 0.0125f * lines;
+                    float heightOffset = 0.08 * lines;
+                    float scaleOffset = 0.0125 * lines;
 
-                    vecPos.z += distanceToCam * (scaleOffset + chatBubbleHeight) + heightOffset + 0.25f;
+                    vecPos.z += distanceToCam * (scaleOffset + chatBubbleHeight) + heightOffset + 0.25;
                     CalcScreenCoors((CVector*)&vecPos, &vecScreen);
                     didFirst = true;
                 } else 
                     vecScreen.y -= textRect.y;
 
                 if (vecScreen.z > 0.0)
-                    drawShadowText(dl, vecScreen.x - textRect.x * 0.5f, vecScreen.y, bubble.m_szText, bubble.m_color);
+                    drawShadowText(dl, vecScreen.x - textRect.x * 0.5, vecScreen.y, bubble.m_szText, bubble.m_color);
 
                 vecScreen.y -= margin;
             }

@@ -14,3 +14,5 @@ void drawShadowText(ImDrawList* dl, float x, float y, std::string text, uint32_t
 char* GetFontFace();
 
 std::string convertCP1251ToUTF8(const std::string& str_cp1251);
+
+ImU32 ñonvertARGBToRGBA(uint32_t sampColor);

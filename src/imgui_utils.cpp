@@ -6,7 +6,7 @@ void changeFontSize(ImGuiIO& io, int size) {
 
     io.Fonts->Clear();
 
-    ImFont* newFont = io.Fonts->AddFontFromFileTTF(font.c_str(), size - 2.0f, NULL, io.Fonts->GetGlyphRangesCyrillic());
+    ImFont* newFont = io.Fonts->AddFontFromFileTTF(font.c_str(), size - 3.0f, NULL, io.Fonts->GetGlyphRangesCyrillic());
 
     if (newFont) {
         io.FontDefault = newFont;
@@ -18,6 +18,7 @@ void changeFontSize(ImGuiIO& io, int size) {
 }
 
 void drawShadowText(ImDrawList* dl, float x, float y, std::string text, uint32_t color) {
+    color = ñonvertARGBToRGBA(color);
     uint32_t shadowColor = color & 0xFF000000;
     text = convertCP1251ToUTF8(text);
 
@@ -42,4 +43,12 @@ std::string convertCP1251ToUTF8(const std::string& str_cp1251) {
     WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), size_needed, &str_utf8[0], utf8_size, NULL, NULL);
 
     return str_utf8;
+}
+
+ImU32 ñonvertARGBToRGBA(uint32_t sampColor) {
+    uint8_t a = (sampColor >> 24) & 0xFF;
+    uint8_t r = (sampColor >> 16) & 0xFF;
+    uint8_t g = (sampColor >> 8) & 0xFF;
+    uint8_t b = (sampColor) & 0xFF;
+    return IM_COL32(r, g, b, a);
 }

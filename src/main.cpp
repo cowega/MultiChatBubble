@@ -119,11 +119,6 @@ void Main::CChatBubble__Draw(
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
 
 
-
-
-
-
-
     if (samp::RefGame() && samp::RefGame()->GetPlayerPed() && samp::RefNetGame()) {
         if (samp::RefLabel())
             samp::RefLabel()->Begin();
@@ -173,7 +168,7 @@ void Main::CChatBubble__Draw(
                     float heightOffset = 0.08f * lines;
                     float scaleOffset = 0.0125f * lines;
 
-                    vecPos.z += distanceToCam * (scaleOffset + chatBubbleHeight) + heightOffset + 0.2f;
+                    vecPos.z += distanceToCam * (scaleOffset + chatBubbleHeight) + heightOffset + 0.25f;
                     CalcScreenCoors((CVector*)&vecPos, &vecScreen);
                     didFirst = true;
                 } else 

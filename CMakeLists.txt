@@ -1,7 +1,7 @@
 ﻿cmake_minimum_required(VERSION 3.15)
 cmake_policy(VERSION 3.15)
 
-project(MCBubble VERSION 0.1.0)
+project(MultiChatBubble VERSION 0.2.0)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
@@ -40,7 +40,13 @@ FetchContent_Declare(
 	GIT_TAG 913151caa8905370229e361486b10c890aeaed45
 )
 
-FetchContent_MakeAvailable(kthook plugin-sdk sampapi imgui)
+FetchContent_Declare(
+  simpleini
+  GIT_REPOSITORY https://github.com/brofield/simpleini.git
+  GIT_TAG master
+)
+
+FetchContent_MakeAvailable(kthook plugin-sdk sampapi imgui simpleini)
 
 file(GLOB IMGUI_SRC
 	"${imgui_SOURCE_DIR}/*.cpp"
@@ -64,11 +70,14 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/kthook/xbyak)
 
 add_library(${PROJECT_NAME} SHARED)
 
+target_include_directories(${PROJECT_NAME} PRIVATE ${simpleini_SOURCE_DIR})
+
 target_sources(${PROJECT_NAME} PRIVATE
 	${${PROJECT_NAME}_LIST}
 	src/main.cpp
 	src/utils.cpp
 	src/imgui_utils.cpp
+	src/settings.cpp
 )
 
 set_target_properties(${PROJECT_NAME}

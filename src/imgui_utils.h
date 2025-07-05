@@ -11,7 +11,7 @@
 #include "imgui.h"
 #include "imgui_impl_dx9.h"
 
-void changeFontSize(ImGuiIO& io, int size);
+void changeFontSize(ImGuiIO& io, int size, std::string fontName);
 
 void drawShadowText(ImDrawList* dl, float x, float y, std::string text, uint32_t color);
 

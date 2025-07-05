@@ -1,19 +1,20 @@
 ﻿#include "imgui_utils.h"
 
-void changeFontSize(ImGuiIO& io, int size) {
+void changeFontSize(ImGuiIO& io, int size, std::string fontName) {
     std::string font{ getenv("WINDIR") };
-    font += "\\Fonts\\" + (std::string)GetFontFace() + "bd.ttf";
+    font += "\\Fonts\\" + fontName;
 
     io.Fonts->Clear();
 
     ImFont* newFont = io.Fonts->AddFontFromFileTTF(font.c_str(), size - 3.0, NULL, io.Fonts->GetGlyphRangesCyrillic());
-    ImGui::GetIO().FontGlobalScale = 1.0f;
+    ImGui::GetIO().FontGlobalScale = 1.0;
 
     if (newFont) {
         io.FontDefault = newFont;
-        std::cout << font << '\n';
-    } else
-        std::cout << "font not found\n";
+    } else {
+        changeFontSize(io, size, "Arialbd.ttf");
+    }
+
     ImGui_ImplDX9_InvalidateDeviceObjects();
     ImGui_ImplDX9_CreateDeviceObjects();
 }
@@ -108,8 +109,7 @@ std::vector<std::string> WrapText(const std::string& text, float maxWidth) {
             }
             if (!chunk.empty())
                 line = chunk;
-        }
-        else {
+        } else {
             line = testLine;
         }
     }

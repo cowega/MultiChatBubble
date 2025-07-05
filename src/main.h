@@ -9,7 +9,6 @@
 #include <sampapi/CLabel.h>
 #include <sampapi/CEntity.h>
 #include <sampapi/CFonts.h>
-#include <sampapi/CChat.h>
 
 #include <d3d9.h>
 #include "imgui.h"
@@ -19,6 +18,7 @@
 
 #include "utils.h"
 #include "imgui_utils.h"
+#include "settings.h"
 
 namespace samp = sampapi::v037r1;
 
@@ -26,8 +26,11 @@ using CChatBubble__DrawProto = void(__thiscall*)(samp::CChatBubble*);
 using CChatBubble__AddProto = int16_t(__thiscall*)(samp::CChatBubble*, uint16_t, const char*, uint32_t, float, int);
 
 class Main {
-public:
+private:
     bool isImguiInitialized = false;
+    Settings settings;
+    std::array<std::vector<samp::CChatBubble::Player>, 1004> g_Bubbles;
+public:
 
     Main();
     ~Main();

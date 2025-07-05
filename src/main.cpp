@@ -1,16 +1,5 @@
 ﻿#include "main.h"
 
-void OpenConsole() {
-    AllocConsole();
-    SetConsoleOutputCP(1251);
-    FILE* fp;
-    freopen_s(&fp, "CONOUT$", "w", stdout);
-    freopen_s(&fp, "CONOUT$", "w", stderr);
-    freopen_s(&fp, "CONIN$", "r", stdin);
-}
-
-std::array<std::array<samp::CChatBubble::Player, 5>, 1004> g_Bubbles;
-
 Main::Main() {
     hookCChatBubble__Draw.set_cb(
         [this](const decltype(hookCChatBubble__Draw)& hook, samp::CChatBubble* p_this
@@ -26,7 +15,10 @@ Main::Main() {
         });
     hookCChatBubble__Add.install();
 
-    OpenConsole();
+    int maxChatBubbles = settings.getMaxChatBubbles();
+    for (auto& vec : g_Bubbles) {
+        vec.resize(maxChatBubbles);
+    }
 }
 
 Main::~Main() {
@@ -58,12 +50,7 @@ int16_t Main::CChatBubble__Add(
     auto orig = hook.get_trampoline()(p_this, n_Player, szText, color, fDrawDistance, lifeSpan);
     bubble = p_this->m_player[n_Player];
     bubble.m_creationTick = lastTick;
-
-    std::string wrapped = wrapText(bubble.m_szText, 36);
-    int lines = countLines(wrapped);
-
-    strcpy(bubble.m_szText, wrapped.c_str());
-    bubble.m_nMaxLineLength = lines;
+    bubble.m_nMaxLineLength = 1; // non used
 
     std::sort(bubbles.begin(), bubbles.end(), [](const auto& a, const auto& b) {
         return a.m_creationTick > b.m_creationTick;
@@ -108,7 +95,7 @@ void Main::CChatBubble__Draw(
     static int fontSize = 0;
     int currentFontSize = getFontSize();
     if (fontSize != currentFontSize) {
-        changeFontSize(ImGui::GetIO(), currentFontSize);
+        changeFontSize(ImGui::GetIO(), currentFontSize, settings.getFontName());
         fontSize = currentFontSize;
     }
 
@@ -118,8 +105,6 @@ void Main::CChatBubble__Draw(
     if (samp::RefGame() && samp::RefGame()->GetPlayerPed() && samp::RefNetGame()) {
         if (samp::RefLabel())
             samp::RefLabel()->Begin();
-
-        float margin = 5.0f;
 
         CVector vecScreen;
         DWORD lastTick = GetTickCount();
@@ -160,8 +145,8 @@ void Main::CChatBubble__Draw(
                 std::string utf8_ChatBubbleText = CP1251ToUTF8(bubble.m_szText);
 
                 std::vector<std::string> lines;
-                float totalHeight = 0.0f;
-                calcTotalHeight(utf8_ChatBubbleText, 300, totalHeight, lines);
+                float totalHeight = 0.0;
+                calcTotalHeight(utf8_ChatBubbleText, settings.getMaxWidth(), totalHeight, lines);
 
                 vecScreen.y -= totalHeight;
                 float y = vecScreen.y;
@@ -169,12 +154,12 @@ void Main::CChatBubble__Draw(
                     for (const auto& line : lines) {
                         ImVec2 size = ImGui::CalcTextSize(line.c_str());
                         float x = vecScreen.x - size.x / 2;
-                        uint32_t color = fadeInOut(lastTick, bubble.m_creationTick, bubble.m_lifeSpan, 180, bubble.m_color);
+                        uint32_t color = fadeInOut(lastTick, bubble.m_creationTick, bubble.m_lifeSpan, settings.getDuration(), bubble.m_color);
                         drawShadowText(dl, x, y, line.c_str(), color);
                         y += size.y;
                     }
                 }
-                vecScreen.y -= margin;
+                vecScreen.y -= settings.getMargin();
             }
         }
         if (samp::RefLabel())

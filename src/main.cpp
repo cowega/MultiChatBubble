@@ -50,7 +50,7 @@ int16_t Main::CChatBubble__Add(
     auto orig = hook.get_trampoline()(p_this, n_Player, szText, color, fDrawDistance, lifeSpan);
     bubble = p_this->m_player[n_Player];
     bubble.m_creationTick = lastTick;
-    bubble.m_nMaxLineLength = 1; // non used
+    bubble.m_nMaxLineLength = 1; // unused
 
     std::sort(bubbles.begin(), bubbles.end(), [](const auto& a, const auto& b) {
         return a.m_creationTick > b.m_creationTick;

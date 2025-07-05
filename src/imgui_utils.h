@@ -1,8 +1,9 @@
 #pragma once
 
-#include <iostream>
-#include <sampapi/sampapi.h>
 #include <Windows.h>
+#include <iostream>
+#include <algorithm>
+#include <sampapi/sampapi.h>
 
 #include "imgui.h"
 #include "imgui_impl_dx9.h"
@@ -16,3 +17,5 @@ char* GetFontFace();
 std::string convertCP1251ToUTF8(const std::string& str_cp1251);
 
 ImU32 ñonvertARGBToRGBA(uint32_t sampColor);
+
+uint32_t fadeInOut(int lastTick, int creationTick, int lifeSpan, int duration, uint32_t color);

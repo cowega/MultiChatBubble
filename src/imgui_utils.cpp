@@ -2,7 +2,7 @@
 
 void changeFontSize(ImGuiIO& io, int size) {
     std::string font{ getenv("WINDIR") };
-    font += "\\Fonts\\" + (std::string)GetFontFace() + ".ttf";
+    font += "\\Fonts\\" + (std::string)GetFontFace() + "bd.ttf";
 
     io.Fonts->Clear();
 
@@ -51,4 +51,22 @@ ImU32 ñonvertARGBToRGBA(uint32_t sampColor) {
     uint8_t g = (sampColor >> 8) & 0xFF;
     uint8_t b = (sampColor) & 0xFF;
     return IM_COL32(r, g, b, a);
+}
+
+uint32_t fadeInOut(int lastTick, int creationTick, int lifeSpan, int duration, uint32_t color) {
+    uint8_t origAlpha = (color >> 24) & 0xFF;
+    int elapsed = lastTick - creationTick;
+    uint8_t alpha = origAlpha;
+
+    if (elapsed < duration) {
+        float t = std::clamp(elapsed / (float)duration, 0.f, 1.f);
+        alpha = static_cast<uint8_t>(origAlpha * t);
+    } else if (elapsed > lifeSpan - duration) {
+        float t = std::clamp((elapsed - (lifeSpan - duration)) / (float)duration, 0.f, 1.f);
+        alpha = static_cast<uint8_t>(origAlpha * (1.0f - t));
+    } else {
+        alpha = origAlpha;
+    }
+
+    return (alpha << 24) | (color & 0x00FFFFFF);
 }

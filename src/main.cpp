@@ -173,8 +173,9 @@ void Main::CChatBubble__Draw(
                 } else 
                     vecScreen.y -= textRect.y;
 
+                uint32_t color = fadeInOut(lastTick, bubble.m_creationTick, bubble.m_lifeSpan, 200, bubble.m_color);
                 if (vecScreen.z > 0.0)
-                    drawShadowText(dl, vecScreen.x - textRect.x * 0.5, vecScreen.y, bubble.m_szText, bubble.m_color);
+                    drawShadowText(dl, vecScreen.x - textRect.x * 0.5, vecScreen.y, bubble.m_szText, color);
 
                 vecScreen.y -= margin;
             }

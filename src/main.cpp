@@ -1,6 +1,17 @@
 ﻿#include "main.h"
 
+void EnableConsole() {
+    AllocConsole();
+    FILE* fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stderr);
+    freopen_s(&fp, "CONIN$", "r", stdin);
+
+    SetConsoleOutputCP(1251);
+}
+
 Main::Main() {
+    EnableConsole();
     hookCChatBubble__Draw.set_cb(
         [this](const decltype(hookCChatBubble__Draw)& hook, samp::CChatBubble* p_this
         ) -> void { return this->CChatBubble__Draw(hook, p_this); });
@@ -50,7 +61,8 @@ int16_t Main::CChatBubble__Add(
     auto orig = hook.get_trampoline()(p_this, n_Player, szText, color, fDrawDistance, lifeSpan);
     bubble = p_this->m_player[n_Player];
     bubble.m_creationTick = lastTick;
-    bubble.m_nMaxLineLength = 1; // unused
+    bubble.m_nMaxLineLength = 1;
+    textFilter(bubble.m_szText);
 
     std::sort(bubbles.begin(), bubbles.end(), [](const auto& a, const auto& b) {
         return a.m_creationTick > b.m_creationTick;
@@ -114,6 +126,7 @@ void Main::CChatBubble__Draw(
             if (!playerInfo)
                 continue;
 
+            // if a player exist, it can be skipped. SAMP bug?
             auto player = playerInfo->m_pPlayer->m_pPed;
             if (!player)
                 continue;
@@ -131,6 +144,7 @@ void Main::CChatBubble__Draw(
             CalcScreenCoors((CVector*)&vecPos, &vecScreen);
 
             for (auto& bubble : g_Bubbles[i]) {
+
                 if (!bubble.m_bExists)
                     continue;
 
@@ -143,6 +157,7 @@ void Main::CChatBubble__Draw(
                 }
 
                 std::string utf8_ChatBubbleText = CP1251ToUTF8(bubble.m_szText);
+                filterText(ImGui::GetFont(), utf8_ChatBubbleText);
 
                 std::vector<std::string> lines;
                 float totalHeight = 0.0;
@@ -150,8 +165,8 @@ void Main::CChatBubble__Draw(
 
                 vecScreen.y -= totalHeight;
                 float y = vecScreen.y;
-                if (vecScreen.z > 0) {
-                    for (const auto& line : lines) {
+                if (vecScreen.z >= 0) {
+                    for (auto& line : lines) {
                         ImVec2 size = ImGui::CalcTextSize(line.c_str());
                         float x = vecScreen.x - size.x / 2;
                         uint32_t color = fadeInOut(lastTick, bubble.m_creationTick, bubble.m_lifeSpan, settings.getDuration(), bubble.m_color);

@@ -131,3 +131,28 @@ void calcTotalHeight(
         totalHeight += size.y;
     }
 }
+
+void filterText(ImFont* font, std::string& text) {
+    const char* src = text.c_str();
+    const char* src_end = src + text.size();
+
+    std::string result;
+
+    while (src < src_end) {
+        ImWchar ch;
+        int char_len = ImTextCharFromUtf8((uint32_t*)&ch, src, src_end);
+        if (char_len <= 0)
+            break;
+
+        if (font->FindGlyphNoFallback(ch)) {
+            result.append(src, char_len);
+        }
+        else {
+            result += ' ';
+        }
+
+        src += char_len;
+    }
+
+    text = result;
+}

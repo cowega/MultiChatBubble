@@ -32,3 +32,5 @@ int getFontSize();
 int getMaxLineLength(char* a1, signed int a2, int a3);
 
 void CalcScreenCoors(CVector* vecWorld, CVector* vecScreen);
+
+void textFilter(char* text);

@@ -26,3 +26,7 @@ void CalcScreenCoors(CVector* vecWorld, CVector* vecScreen) {
     vecScreen->x *= (float)(fRecip * (*dwLenX));
     vecScreen->y *= (float)(fRecip * (*dwLenY));
 }
+
+void textFilter(char* text) {
+    return reinterpret_cast<void(__cdecl*)(char*)>(sampapi::GetBase() + 0xAF780)(text);
+}

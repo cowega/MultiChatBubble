@@ -10,6 +10,7 @@
 
 #include "imgui.h"
 #include "imgui_impl_dx9.h"
+#include "imgui_internal.h"
 
 void changeFontSize(ImGuiIO& io, int size, std::string fontName);
 
@@ -30,3 +31,5 @@ void calcTotalHeight(
     float maxWidth, float& totalHeight,
     std::vector<std::string>& lines
 );
+
+void filterText(ImFont* font, std::string& text);

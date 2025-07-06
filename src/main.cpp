@@ -1,17 +1,6 @@
 ﻿#include "main.h"
 
-void EnableConsole() {
-    AllocConsole();
-    FILE* fp;
-    freopen_s(&fp, "CONOUT$", "w", stdout);
-    freopen_s(&fp, "CONOUT$", "w", stderr);
-    freopen_s(&fp, "CONIN$", "r", stdin);
-
-    SetConsoleOutputCP(1251);
-}
-
 Main::Main() {
-    EnableConsole();
     hookCChatBubble__Draw.set_cb(
         [this](const decltype(hookCChatBubble__Draw)& hook, samp::CChatBubble* p_this
         ) -> void { return this->CChatBubble__Draw(hook, p_this); });

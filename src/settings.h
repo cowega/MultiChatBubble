@@ -6,7 +6,7 @@
 
 class Settings {
 private:
-	std::string configFileName = "MultiCharBubble.ini";
+	std::string configFileName = "MultiChatBubble.ini";
 	CSimpleIni ini;
 
 	float fadeInOutDuration;

@@ -30,3 +30,17 @@ void CalcScreenCoors(CVector* vecWorld, CVector* vecScreen) {
 void textFilter(char* text) {
     return reinterpret_cast<void(__cdecl*)(char*)>(sampapi::GetBase() + 0xAF780)(text);
 }
+
+void clearInput(char* str) {
+    textFilter(str);
+    char* src = str;
+    char* dst = str;
+
+    while (*src) {
+        if (*src != '\n' && *src != '\r' && *src != '\0') {
+            *dst++ = *src;
+        }
+        ++src;
+    }
+    *dst = '\0';
+}

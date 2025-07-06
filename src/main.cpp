@@ -34,24 +34,30 @@ int16_t Main::CChatBubble__Add(
     auto& bubbles = g_Bubbles[n_Player];
     DWORD lastTick = GetTickCount();
 
-    auto it = std::min_element(bubbles.begin(), bubbles.end(), [lastTick](const auto& a, const auto& b) {
-        bool a_dead = (a.m_creationTick + a.m_lifeSpan <= lastTick);
-        bool b_dead = (b.m_creationTick + b.m_lifeSpan <= lastTick);
+    char copyText[256];
+    strcpy(copyText, szText);
+    clearInput(copyText);
+    samp::CChatBubble::Player* bubble = nullptr;
+    if (!strcmp(copyText, bubbles[0].m_szText)) {
+        bubble = &bubbles[0];
+    } else {
+        bubble = &*std::min_element(bubbles.begin(), bubbles.end(), [lastTick](const auto& a, const auto& b) {
+            bool a_dead = (a.m_creationTick + a.m_lifeSpan <= lastTick);
+            bool b_dead = (b.m_creationTick + b.m_lifeSpan <= lastTick);
 
-        if (a_dead && !b_dead) return true;
-        if (!a_dead && b_dead) return false;
-        if (a_dead && b_dead) return false;
+            if (a_dead && !b_dead) return true;
+            if (!a_dead && b_dead) return false;
+            if (a_dead && b_dead) return false;
 
-        return a.m_creationTick < b.m_creationTick;
-        });
-
-    samp::CChatBubble::Player& bubble = *it;
+            return a.m_creationTick < b.m_creationTick;
+            });
+    }
 
     auto orig = hook.get_trampoline()(p_this, n_Player, szText, color, fDrawDistance, lifeSpan);
-    bubble = p_this->m_player[n_Player];
-    bubble.m_creationTick = lastTick;
-    bubble.m_nMaxLineLength = 1;
-    textFilter(bubble.m_szText);
+    *bubble = p_this->m_player[n_Player];
+    strcpy(bubble->m_szText, copyText);
+    bubble->m_creationTick = lastTick;
+    bubble->m_nMaxLineLength = 1;
 
     std::sort(bubbles.begin(), bubbles.end(), [](const auto& a, const auto& b) {
         return a.m_creationTick > b.m_creationTick;

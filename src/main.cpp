@@ -126,8 +126,11 @@ void Main::CChatBubble__Draw(
             if (!playerInfo)
                 continue;
 
-            // if a player exist, it can be skipped. SAMP bug?
-            auto player = playerInfo->m_pPlayer->m_pPed;
+            auto m_player = playerInfo->m_pPlayer;
+            if (!m_player)
+                continue;
+
+            auto player = m_player->m_pPed;
             if (!player)
                 continue;
 
@@ -144,7 +147,6 @@ void Main::CChatBubble__Draw(
             CalcScreenCoors((CVector*)&vecPos, &vecScreen);
 
             for (auto& bubble : g_Bubbles[i]) {
-
                 if (!bubble.m_bExists)
                     continue;
 

@@ -120,17 +120,14 @@ void Main::CChatBubble__Draw(
 
         CVector vecScreen;
         DWORD lastTick = GetTickCount();
-        int largestId = samp::RefNetGame()->m_pPools->m_pPlayer->m_nLargestId;
+        auto playerPool = samp::RefNetGame()->GetPlayerPool();
+        int largestId = playerPool->m_nLargestId;
         for (int i = 0; i < largestId; i++) {
-            auto playerInfo = samp::RefNetGame()->m_pPools->m_pPlayer->m_pObject[i];
-            if (!playerInfo)
+            auto remotePlayer = playerPool->GetPlayer(i);
+            if (!remotePlayer)
                 continue;
 
-            auto m_player = playerInfo->m_pPlayer;
-            if (!m_player)
-                continue;
-
-            auto player = m_player->m_pPed;
+            auto player = remotePlayer->m_pPed;
             if (!player)
                 continue;
 

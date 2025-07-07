@@ -15,6 +15,11 @@ Main::Main() {
         });
     hookCChatBubble__Add.install();
 
+    
+    plugin::Events::d3dLostEvent +=
+        []() { ImGui_ImplDX9_InvalidateDeviceObjects(); };
+
+
     int maxChatBubbles = settings.getMaxChatBubbles();
     for (auto& vec : g_Bubbles) {
         vec.resize(maxChatBubbles);

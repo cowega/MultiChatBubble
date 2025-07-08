@@ -101,9 +101,6 @@ void Main::CChatBubble__Draw(
         return;
     }
 
-    if (!samp::RefGame() || !samp::RefNetGame())
-        return;
-
     ImGui_ImplWin32_NewFrame();
     ImGui_ImplDX9_NewFrame();
 
@@ -117,35 +114,40 @@ void Main::CChatBubble__Draw(
     ImGui::NewFrame();
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
 
-    auto playerPool = samp::RefNetGame()->GetPlayerPool();
+    auto netGame = samp::RefNetGame();
+    if (!netGame)
+        return;
+
+    auto playerPool = netGame->GetPlayerPool();
     if (!playerPool)
         return;
 
-    CVector vecScreen;
-    DWORD lastTick = GetTickCount();
-    auto maxId = playerPool->m_nLargestId;
-    for (int id = 0; id < maxId; id++) {
-        if (!playerPool->m_bNotEmpty[id])
+    const auto lastTick = GetTickCount();
+    for (int i = 0; i < 1004; i++) {
+        if (!playerPool->m_bNotEmpty[i])
             continue;
 
-        auto ped = playerPool->GetPlayer(id)->m_pPed;
-        if (!ped)
+        auto remotePlayer = playerPool->GetPlayer(i);
+        if (!remotePlayer->DoesExist())
             continue;
 
+        auto ped = remotePlayer->m_pPed;
         auto gamePed = ped->m_pGamePed;
         if (!gamePed)
             continue;
 
-        float distanceToCam = ped->GetDistanceToCamera();
-        float distanceToPlayer = ped->GetDistanceToLocalPlayer();
+        const auto distanceToCam = ped->GetDistanceToCamera();
+        const auto distanceToPlayer = ped->GetDistanceToLocalPlayer();
         float chatBubbleHeight = getChatBubbleHeight();
 
         sampapi::CVector headPos;
         ped->GetBonePosition(8, &headPos);
+
         headPos.z += distanceToCam * chatBubbleHeight + 0.2;
+        CVector vecScreen;
         CalcScreenCoors((CVector*)&headPos, &vecScreen);
 
-        for (auto& bubble : g_Bubbles[id]) {
+        for (auto& bubble : g_Bubbles[i]) {
             if (!bubble.m_bExists)
                 continue;
 
@@ -166,7 +168,7 @@ void Main::CChatBubble__Draw(
 
             vecScreen.y -= totalHeight;
             float y = vecScreen.y;
-            if (ped->IsOnScreen()) {
+            if (vecScreen.z >= 0.0) {
                 for (auto& line : lines) {
                     ImVec2 size = ImGui::CalcTextSize(line.c_str());
                     float x = vecScreen.x - size.x / 2;

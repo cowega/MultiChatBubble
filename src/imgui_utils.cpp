@@ -125,7 +125,7 @@ void calcTotalHeight(
     float maxWidth, float& totalHeight,
     std::vector<std::string>& lines
 ) {
-    lines = WrapText(text, 300);
+    lines = WrapText(text, maxWidth);
     for (const auto& line : lines) {
         ImVec2 size = ImGui::CalcTextSize(line.c_str());
         totalHeight += size.y;

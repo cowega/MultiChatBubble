@@ -100,8 +100,6 @@ set_target_properties(${PROJECT_NAME}
 	PROPERTIES
 	OUTPUT_NAME ${OUT_NAME}
 	SUFFIX ".asi"
-
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE "D:\\SAMP_R3"
 )
 
 target_link_libraries(${PROJECT_NAME}

@@ -31,7 +31,7 @@ void drawShadowText(ImDrawList* dl, float x, float y, std::string text, uint32_t
 }
 
 char* GetFontFace() {
-	return reinterpret_cast<char*(__cdecl*)()>(sampapi::GetBase() + 0xB3D40)();
+	return reinterpret_cast<char*(__cdecl*)()>(sampapi::GetBase() + GetFontFaceAddr)();
 }
 
 std::string CP1251ToUTF8(const std::string& cp1251)

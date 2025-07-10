@@ -1,16 +1,15 @@
 #pragma once
 
 #include <Windows.h>
-#include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <vector>
 
-#include <sampapi/sampapi.h>
-
 #include "imgui.h"
 #include "imgui_impl_dx9.h"
 #include "imgui_internal.h"
+
+#include "samp_multiver.h"
 
 void changeFontSize(ImGuiIO& io, int size, std::string fontName);
 

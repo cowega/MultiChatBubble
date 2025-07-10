@@ -1,15 +1,11 @@
 #include "utils.h"
 
 float getChatBubbleHeight() {
-    return *reinterpret_cast<float*>(sampapi::GetBase() + 0xD795C);
+    return *reinterpret_cast<float*>(sampapi::GetBase() + GetChatBubbleHeightAddr);
 }
 
 int getFontSize() {
-    return reinterpret_cast<int(__cdecl*)()>(sampapi::GetBase() + 0xB3C60)();
-}
-
-int getMaxLineLength(char* a1, signed int a2, int a3) {
-    return reinterpret_cast<int(__cdecl*)(char*, signed int, int)>(sampapi::GetBase() + 0x13DB0)(a1, a2, a3);
+    return reinterpret_cast<int(__cdecl*)()>(sampapi::GetBase() + GetFontSizeAddr)();
 }
 
 void CalcScreenCoors(CVector* vecWorld, CVector* vecScreen) {
@@ -28,7 +24,7 @@ void CalcScreenCoors(CVector* vecWorld, CVector* vecScreen) {
 }
 
 void textFilter(char* text) {
-    return reinterpret_cast<void(__cdecl*)(char*)>(sampapi::GetBase() + 0xAF780)(text);
+    return reinterpret_cast<void(__cdecl*)(char*)>(sampapi::GetBase() + TextFilterAddr)(text);
 }
 
 void clearInput(char* str) {

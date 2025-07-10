@@ -1,10 +1,9 @@
 #pragma once
 
 #include <Windows.h>
-#include <iostream>
 #include "plugin.h"
 
-#include <sampapi/CNetGame.h>
+#include "samp_multiver.h"
 
 struct D3DXMATRIX {
     union {
@@ -28,8 +27,6 @@ struct D3DXMATRIX {
 float getChatBubbleHeight();
 
 int getFontSize();
-
-int getMaxLineLength(char* a1, signed int a2, int a3);
 
 void CalcScreenCoors(CVector* vecWorld, CVector* vecScreen);
 

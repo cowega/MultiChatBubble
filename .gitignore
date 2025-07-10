@@ -4,3 +4,5 @@ kthook/
 out/
 pluginsdk/
 sampapi/
+
+CMakeSettings.json

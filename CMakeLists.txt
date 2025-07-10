@@ -1,7 +1,7 @@
 ﻿cmake_minimum_required(VERSION 3.15)
 cmake_policy(VERSION 3.15)
 
-project(MultiChatBubble VERSION 1.0.3)
+project(MultiChatBubble VERSION 1.2.0)
 
 option(BUILD_SAMP_R1 "Build for SAMP R1 version" OFF)
 option(BUILD_SAMP_R3 "Build for SAMP R3 version" OFF)
